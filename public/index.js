@@ -1,6 +1,48 @@
 let transactions = [];
 let myChart;
 
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then((reg) => {
+        console.log('Service worker registered.', reg);
+      });
+  });
+}
+
+let db;
+function saveRecord(record) {
+  const transaction = db.transaction([
+    "pending"
+  ], "readwrite")
+
+  const store = transaction.objectStore("pending")
+  store.add(record)
+
+}
+const request = window.indexedDB.open("toDoList", 1);
+
+request.onupgradeneeded = ({ target }) => {
+  const db = target.result;
+
+  const objectStore = db.createObjectStore("toDoList");
+  objectStore.createIndex("timestamp", "timestamp");
+};
+
+request.onsuccess = event => {
+  console.log(request.result);
+};
+
+
+
+
+
+
+
+
+
+
 fetch("/api/transaction")
   .then(response => {
     return response.json();
